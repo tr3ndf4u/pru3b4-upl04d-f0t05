@@ -36,7 +36,7 @@ $(".xsend").click(function() {
    $("#info SPAN").html("procesando, espere... &raquo; "+ $(this).val());
    var source = ($(this).attr('data-source') == 'library') ? Camera.PictureSourceType.PHOTOLIBRARY : Camera.PictureSourceType.CAMERA;
    //obtiene imagen
-   navigator.camera.getPicture(procesaImagen, fail, {quality: 45, sourceType: source, destinationType: Camera.DestinationType.FILE_URI});
+   navigator.camera.getPicture(procesaImagen, fail, {quality: 45, allowEdit: true, saveToPhotoAlbum: true, sourceType: source, destinationType: Camera.DestinationType.FILE_URI});
    $(".wait").show();
 })
    function fail(message) {
@@ -61,7 +61,7 @@ $(".xsend").click(function() {
       t = jQuery.parseJSON(r.response);
       var img = $("<img />").attr('src',t.img).load(function(){
          $(".wait").hide();
-         $("#info SPAN").html('').append('<img src="'+t.img+'" />').append("<br />"+t.txt);
+         $("#info SPAN").html('').append('<img with="100%" src="'+t.img+'" />').append("<br />"+t.txt);
          $(".xsend").removeAttr('readonly');
       });
    }
