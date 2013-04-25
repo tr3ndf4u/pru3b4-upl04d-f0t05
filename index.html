@@ -1,0 +1,74 @@
+ 
+<!--
+ club nono
+ http://clubnono.tumblr.com/
+ Jorge Martinez M. <jorgem@gmail.com> @toro
+ejemplo uso de cámara v2
+ -->
+<!DOCTYPE html>
+<html>
+  <head>
+  <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta charset="utf-8">
+	<script type="text/javascript" charset="utf-8" src="android/cordova-2.6.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="jquerymobile/jquery-1.6.4.min.js"></script>
+<style type="text/css">
+   body { font-family: 'lucida grande',sans-serif; text-align:center; }
+   h1 { margin:5px;font-size:1.5em; letter-spacing:-1px; }
+   .xsend { font-size:1.1em; }
+   .wait { display:none; }
+</style>
+  </head>
+
+  <body>
+    <div id="content">
+	<h1>Subir imagen</h1>
+   <div id="info"><img class="wait" src="../wait.gif"> <span>Elija la fuente</span></div>
+    <p align="center">
+      <input type="button" class="xsend" data-source="library" value="Biblioteca" />
+      <input type="button" class="xsend" data-source="camera" value="Cámara" />
+	</p>
+       <a href="http://clubnono.tumblr.com">http://clubnono.tumblr.com</a>
+    </div>
+<script type="text/javascript">
+$(".xsend").click(function() {
+   $(".xsend").attr('readonly','true');
+   $("#info SPAN").html("procesando, espere... &raquo; "+ $(this).val());
+   var source = ($(this).attr('data-source') == 'library') ? Camera.PictureSourceType.PHOTOLIBRARY : Camera.PictureSourceType.CAMERA;
+   //obtiene imagen
+   navigator.camera.getPicture(procesaImagen, fail, {quality: 45, sourceType: source, destinationType: Camera.DestinationType.FILE_URI});
+   $(".wait").show();
+})
+   function fail(message) {
+      $("#info SPAN").html(message); $(".wait").hide();
+      $(".xsend").removeAttr('readonly');
+   }
+   function procesaImagen(imageURI) {
+      $(".xsend").attr('disable','disable');
+      $(".wait").show(); 
+      $("#info SPAN").html('<br />subiendo, espere...');
+      var options = new FileUploadOptions();
+      options.fileKey="archivo";
+      options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
+      options.mimeType="image/jpeg";
+      var params = new Object();
+      params.device = device.platform;
+      options.params = params;
+      var ft = new FileTransfer();
+      ft.upload(imageURI, "http://elsiglo.mx/apps/tmp/upload.php", sube, falla, options);
+   }
+   function sube(r) {
+      t = jQuery.parseJSON(r.response);
+      var img = $("<img />").attr('src',t.img).load(function(){
+         $(".wait").hide();
+         $("#info SPAN").html('').append('<img src="'+t.img+'" />').append("<br />"+t.txt);
+         $(".xsend").removeAttr('readonly');
+      });
+   }
+   function falla(error) {
+      alert("Error: "+ error.code);
+   }
+</script>
+  </body>
+</html>
